@@ -1,65 +1,73 @@
 #include "sort.h"
+
 /**
- * quick_sort_rec - sorts an array of integers in ascending order using
- * the Selection sort algorithm using recursion
- * @array: pointer to array
- * @size: size of the array
- * @array_init: initial pointer to array
- * @size_init: initial size of the array
- **/
-void quick_sort_rec(int *array_init, size_t size_init, int *array, size_t size)
+ * swap_items - Swaps two items in an array.
+ * @array: The array to modify.
+ * @l: The index of the left item.
+ * @r: The index of the right item.
+ */
+void swap_items(int *array, size_t l, size_t r)
 {
-	size_t j, aux;
-	int aux2;
-	int i = -1, n, pivot = array[size - 1];
+	int tmp;
 
-	if (array && size > 1)
+	if (array != NULL)
 	{
-		for (j = 0; j < size - 1; j++)
-		{
-			if (array[j] < pivot)
-			{
-				i++;
-				aux = i;
-				if (aux != j && array[j] != array[aux])
-				{
-					n = array[j];
-					array[j] = array[i];
-					array[i] = n;
-					print_array(array_init, size_init);
-				}
-			}
-
-
-		}
-		aux2 = size;
-		if (aux2 - 1 != i + 1 && array[aux2 - 1] != array[i + 1])
-		{
-			array[size - 1] = array[i + 1];
-			array[i + 1] = pivot;
-			print_array(array_init, size_init);
-		}
-		if (i > 0)
-		{
-			quick_sort_rec(array_init, size_init, array, i + 1);
-		}
-		quick_sort_rec(array_init, size_init, array + i + 2,  size - (i + 2));
+		tmp = array[l];
+		array[l] = array[r];
+		array[r] = tmp;
 	}
 }
+
 /**
- * quick_sort - sorts an array of integers in ascending order using
- * the Selection sort algorithm
- * @array: pointer to array
- * @size: size of the array
-**/
+ * quick_sort_range_lomuto - Sorts a sub array using the
+ * quick sort algorithm and Lomuto's partition scheme.
+ * @array: The array containing the sub-array.
+ * @low: The starting position of the sub-array.
+ * @high: The ending position of the sub-array.
+ * @size: The length of the array.
+ */
+void quick_sort_range_lomuto(int *array, size_t low, size_t high, size_t size)
+{
+	size_t k, i;
+	int pivot;
+
+	if ((low >= high) || (array == NULL))
+		return;
+	pivot = array[high];
+	k = low;
+	for (i = low; i < high; i++)
+	{
+		if (array[i] <= pivot)
+		{
+			if (k != i)
+			{
+				swap_items(array, k, i);
+				print_array(array, size);
+			}
+			k++;
+		}
+	}
+	if (k != high)
+	{
+		swap_items(array, k, high);
+		print_array(array, size);
+	}
+	if (k - low > 1)
+		quick_sort_range_lomuto(array, low, k - 1, size);
+	if (high - k > 1)
+		quick_sort_range_lomuto(array, k + 1, high, size);
+}
+
+/**
+ * quick_sort - Sorts an array using the quick sort algorithm
+ * and Lomuto's partition scheme.
+ * @array: The array to sort.
+ * @size: The length of the array.
+ */
 void quick_sort(int *array, size_t size)
 {
-	int *array_init;
-	size_t size_init;
-
-	if (array)
+	if (array != NULL)
 	{
-		array_init = array;
-		size_init = size;
-		quick_sort_rec(array_init, size_init, array, size);
+		quick_sort_range_lomuto(array, 0, size - 1, size);
 	}
+}

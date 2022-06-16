@@ -1,70 +1,82 @@
 #include "sort.h"
+
 /**
- * check_tree - swiftdown check
- * @array: pointer to array
- * @size: size of the pointer
- * @size_init: original size of the array
- * @i: index as a root of the tree
- *
-**/
-void check_tree(int *array, size_t size_init, size_t size, size_t i)
+ * swap_items - Swaps two items in an array.
+ * @array: The array to modify.
+ * @l: The index of the left item.
+ * @r: The index of the right item.
+ */
+void swap_items(int *array, size_t l, size_t r)
 {
+	int tmp;
 
-	int n, branch1, branch2;
-	size_t br1, br2;
-
-	br1 = i * 2 + 1;
-	br2 = br1 + 1;
-	branch1 = array[br1];
-	branch2 = array[br2];
-	if (((br1 < size) && (br2 < size) &&
-		(branch1 >= branch2 && branch1 > array[i]))
-		|| ((br1 == size - 1) && branch1 > array[i]))
+	if (array != NULL)
 	{
-		n = array[i];
-		array[i] = branch1;
-		array[br1] = n;
-		print_array(array, size_init);
+		tmp = array[l];
+		array[l] = array[r];
+		array[r] = tmp;
 	}
-	else if ((br1 < size) && (br2 < size) &&
-		(branch2 > branch1 && branch2 > array[i]))
-	{
-		n = array[i];
-		array[i] = branch2;
-		array[br2] = n;
-		print_array(array, size_init);
-	}
-	if (br1 < size - 1)
-		check_tree(array, size_init, size, br1);
-	if (br2 < size - 1)
-		check_tree(array, size_init, size, br2);
 }
+
 /**
- * heap_sort - sorts an array of integers
- * in ascending order using the Heap
- * sort algorithm
- * @array: pointer to array
- * @size: size of the pointer
- *
-**/
+ * sift_down - Moves the largest element in an array to its correct
+ * sorted position in a max-heap sub-array.
+ * @array: The array to sort.
+ * @arr_size: The length of the array.
+ * @size: The length of the max heap sub-array.
+ * @pos: The position of the largest element in the max heap sub-array.
+ */
+void sift_down(int *array, int arr_size, int size, int pos)
+{
+	int j, child;
+
+	j = pos;
+	while (j < (size / 2))
+	{
+		child = (2 * j) + 1;
+		if ((child < (size - 1)) && (array[child] < array[child + 1]))
+			child++;
+		if (array[j] >= array[child])
+			return;
+		swap_items(array, j, child);
+		print_array(array, arr_size);
+		j = child;
+	}
+}
+
+/**
+ * build_max_heap - Builds a max heap binary tree with the given array.
+ * @array: The array to convert to a max heap binary tree.
+ * @size: The length of the array.
+ */
+void build_max_heap(int *array, int size)
+{
+	int a;
+
+	for (a = (size / 2) - 1; a >= 0; a--)
+	{
+		sift_down(array, size, size, a);
+	}
+}
+
+/**
+ * heap_sort - Sorts an array using the heap sort algorithm.
+ * @array: The array to sort.
+ * @size: The length of the array.
+ */
 void heap_sort(int *array, size_t size)
 {
-	size_t i, size_init = size;
-	int n;
+	int i, n;
 
-	if (!array)
-		return;
-	for (i = 0; i < size / 2 ; i++)
+	build_max_heap(array, size);
+	n = size;
+	for (i = 0; i < (int)size; i++)
 	{
-		check_tree(array, size_init, size, size / 2 - 1 - i);
+		swap_items(array, --n, 0);
+		if (n != 0)
+		{
+			print_array(array, size);
+			sift_down(array, size, n, 0);
+		}
 	}
-	for (i = 0; i < size_init - 1; i++)
-	{
-		n = array[0];
-		array[0] = array[size - 1 - i];
-		array[size - 1 - i] = n;
-		print_array(array, size_init);
-		check_tree(array, size_init, size - i - 1, 0);
-	}
-
 }
